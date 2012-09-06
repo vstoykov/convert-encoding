@@ -21,12 +21,15 @@ def get_version():
     return '.'.join(unicode(x) for x in __version__)
 
 
-def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING, output_encoding=DEFAULT_OUTPUT_ENCODING):
-    out_file_name = "%s.%s%s" % (in_file_name[:-4], output_encoding, in_file_name[-4:])
+def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
+                                output_encoding=DEFAULT_OUTPUT_ENCODING):
+    out_file_name = "%s.%s%s" % (in_file_name[:-4],
+                                 output_encoding, in_file_name[-4:])
 
     with open(in_file_name, 'r') as in_file:
         try:
-            new_content = in_file.read().decode(input_encoding).encode(output_encoding)
+            new_content = in_file.read().decode(
+                                input_encoding).encode(output_encoding)
         except:
             print "Cant convert %s" % in_file_name
         else:
