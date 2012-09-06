@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
 Program that convert text files from one encoding to another.
-By default is used to convert windows-1251 encoded subtitles
-into ISO-8859-5 ecoded because this is encoded for cyrilic
+By default it is used to convert windows-1251 encoded subtitles
+into ISO-8859-5 ecoded because this is encoding for cyrilic
 characters in Panasonic Viera TV
 
 created by Venelin Stoykov <vkstoykov@gmail.com>
@@ -42,12 +42,16 @@ def main(*args, **options):
 if __name__ == '__main__':
     prog_name = os.path.basename(sys.argv[0])
     opt_parser = OptionParser(
-        prog=prog_name,
-        version=get_version(),
-        option_list=(
-                make_option('--input-encoding', dest='input_encoding', help="Encoding on the input file", default=DEFAULT_INPUT_ENCODING),
-                make_option('--output-encoding', dest='output_encoding', help="Encoding on the output file", default=DEFAULT_OUTPUT_ENCODING),
-            )
+            prog=prog_name,
+            version=get_version(),
+            option_list=(
+                    make_option('--input-encoding', dest='input_encoding',
+                                default=DEFAULT_INPUT_ENCODING,
+                                help="Encoding on the input file"),
+                    make_option('--output-encoding', dest='output_encoding',
+                                default=DEFAULT_OUTPUT_ENCODING,
+                                help="Encoding on the output file"),
+                )
         )
     options, args = opt_parser.parse_args(sys.argv[1:])
     main(*args, **options.__dict__)
