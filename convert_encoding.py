@@ -28,13 +28,20 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
 
     with open(in_file_name, 'r') as in_file:
         try:
-            new_content = in_file.read().decode(
-                                input_encoding).encode(output_encoding)
-        except:
-            print "Cant convert %s" % in_file_name
-        else:
-            with open(out_file_name, 'w') as out_file:
-                out_file.write(new_content)
+            content = in_file.read().decode(input_encoding)
+        except Exception as ex:
+            print u"Can't read '%s' because: %s" % (in_file_name, ex)
+            return False
+
+        new_content = []
+        for char in content:
+            try:
+                new_content += char.encode(output_encoding)
+            except Exception as ex:
+                new_content += '?'
+
+        with open(out_file_name, 'w') as out_file:
+            out_file.write(''.join(new_content))
 
 
 def main(*args, **options):
