@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 """
 Program that convert text files from one encoding to another.
 By default it is used to convert windows-1251 encoded subtitles
@@ -11,14 +12,23 @@ import sys
 import os
 from optparse import make_option, OptionParser
 
-__version__ = (0, 1)
+__version__ = (0, 2)
 
 DEFAULT_INPUT_ENCODING = 'windows-1251'
 DEFAULT_OUTPUT_ENCODING = 'iso-8859-5'
 
+FAILSAFE_CHARACTERS = {
+    u'\u2122': 'TM',
+    u'\u201c': '"',
+    u'\u201d': '"',
+}
 
 def get_version():
     return '.'.join(unicode(x) for x in __version__)
+
+
+def get_failsafe_char(char, output_encoding):
+    return FAILSAFE_CHARACTERS.get(char, '?').encode(output_encoding)
 
 
 def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
@@ -30,18 +40,18 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
         try:
             content = in_file.read().decode(input_encoding)
         except Exception as ex:
-            print u"Can't read '%s' because: %s" % (in_file_name, ex)
-            return False
-
-        new_content = []
-        for char in content:
-            try:
-                new_content += char.encode(output_encoding)
-            except Exception as ex:
-                new_content += '?'
-
-        with open(out_file_name, 'w') as out_file:
-            out_file.write(''.join(new_content))
+            print "Can't read '%s' because: %s" % (in_file_name, ex)
+        else:
+            new_content = []
+            for char in content:
+                try:
+                    new_content.append(char.encode(output_encoding))
+                except Exception as ex:
+                    new_content.append(get_failsafe_char(char, output_encoding))
+                
+            with open(out_file_name, 'w') as out_file:
+                for char in new_content:
+                    out_file.write(char)
 
 
 def main(*args, **options):
