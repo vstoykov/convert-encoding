@@ -13,9 +13,12 @@ created by Venelin Stoykov <vkstoykov@gmail.com>
 from __future__ import unicode_literals
 import sys
 import os
+import logging
+
+from io import BytesIO
 from optparse import make_option, OptionParser
 
-__version__ = (0, 4)
+__version__ = (0, 5)
 
 DEFAULT_INPUT_ENCODING = 'windows-1251'
 DEFAULT_OUTPUT_ENCODING = 'iso-8859-5'
@@ -45,23 +48,28 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
         try:
             content = in_file.read().decode(input_encoding)
         except Exception as ex:
-            print("Can't read '%s' because: %s" % (in_file_name, ex))
-        else:
-            new_content = []
-            for char in content:
-                try:
-                    new_content.append(char.encode(output_encoding))
-                except Exception as ex:
-                    new_content.append(get_failsafe_char(char, output_encoding))
+            logging.error("Can't read '%s' because: %s" % (in_file_name, ex))
+            return False
 
-            with open(out_file_name, 'wb') as out_file:
-                for char in new_content:
-                    out_file.write(char)
+    new_content = BytesIO()
+    for char in content:
+        try:
+            new_content.write(char.encode(output_encoding))
+        except Exception as ex:
+            new_content.write(get_failsafe_char(char, output_encoding))
+
+    with open(out_file_name, 'wb') as out_file:
+        out_file.write(new_content.getvalue())
+    return True
 
 
 def main(*args, **options):
+    has_errors = False
     for in_file in args:
-        convert_to(in_file, **options)
+        has_errors = convert_to(in_file, **options) or has_errors
+
+    if has_errors:
+        sys.exit(1)
 
 
 if __name__ == '__main__':
