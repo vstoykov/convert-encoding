@@ -66,7 +66,7 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
 def main(*args, **options):
     has_errors = False
     for in_file in args:
-        has_errors = convert_to(in_file, **options) or has_errors
+        has_errors = not convert_to(in_file, **options) or has_errors
 
     if has_errors:
         sys.exit(1)
