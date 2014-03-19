@@ -18,7 +18,7 @@ import logging
 from io import BytesIO
 from optparse import make_option, OptionParser
 
-__version__ = (0, 5)
+__version__ = (0, 6)
 
 DEFAULT_INPUT_ENCODING = 'windows-1251'
 DEFAULT_OUTPUT_ENCODING = 'iso-8859-5'
@@ -81,11 +81,14 @@ if __name__ == '__main__':
         option_list=(
             make_option('-i', '--input-encoding', dest='input_encoding',
                         default=DEFAULT_INPUT_ENCODING,
-                        help="Encoding on the input file"),
+                        help="Encoding on the input file (Default is: %s)." % DEFAULT_INPUT_ENCODING),
             make_option('-o', '--output-encoding', dest='output_encoding',
                         default=DEFAULT_OUTPUT_ENCODING,
-                        help="Encoding on the output file"),
+                        help="Encoding on the output file (Default is: %s)." % DEFAULT_OUTPUT_ENCODING),
         )
     )
     options, args = opt_parser.parse_args(sys.argv[1:])
-    main(*args, **options.__dict__)
+    if args:
+        main(*args, **options.__dict__)
+    else:
+        opt_parser.print_help()
