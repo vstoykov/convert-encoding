@@ -18,7 +18,7 @@ import logging
 from io import open, BytesIO
 from optparse import make_option, OptionParser
 
-__version__ = (0, 6)
+__version__ = (0, 7)
 
 DEFAULT_INPUT_ENCODING = 'windows-1251'
 DEFAULT_OUTPUT_ENCODING = 'iso-8859-5'

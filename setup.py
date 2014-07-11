@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="convert-encoding",
-    version='0.6',
+    version='0.7',
     author="Venelin Stoykov",
     author_email="vkstoykov@gmail.com",
     description="Convert text files from one encoding to another.",
