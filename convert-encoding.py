@@ -15,7 +15,7 @@ import sys
 import os
 import logging
 
-from io import BytesIO
+from io import open, BytesIO
 from optparse import make_option, OptionParser
 
 __version__ = (0, 6)
@@ -44,9 +44,9 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
     out_file_name = "%s.%s%s" % (in_file_name[:-4],
                                  output_encoding, in_file_name[-4:])
 
-    with open(in_file_name, 'rb') as in_file:
+    with open(in_file_name, 'rt', encoding=input_encoding, newline='') as in_file:
         try:
-            content = in_file.read().decode(input_encoding)
+            content = in_file.read()
         except Exception as ex:
             logging.error("Can't read '%s' because: %s" % (in_file_name, ex))
             return False
