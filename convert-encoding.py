@@ -39,18 +39,22 @@ def get_failsafe_char(char, output_encoding):
     return FAILSAFE_CHARACTERS.get(char, '?').encode(output_encoding)
 
 
+def read_file(file_name, ecoding):
+    with open(file_name, 'rt', encoding=ecoding, newline='') as in_file:
+        return in_file.read()
+
+
 def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
                output_encoding=DEFAULT_OUTPUT_ENCODING):
-    out_file_name = "%s.%s%s" % (in_file_name[:-4],
-                                 output_encoding, in_file_name[-4:])
 
-    with open(in_file_name, 'rt', encoding=input_encoding, newline='') as in_file:
-        try:
-            content = in_file.read()
-        except Exception as ex:
-            logging.error("Can't read '%s' because: %s" % (in_file_name, ex))
-            return False
+    # Read the content of the file
+    try:
+        content = read_file(in_file_name, input_encoding)
+    except Exception as ex:
+        logging.error("Can't read '%s' because: %s" % (in_file_name, ex))
+        return False
 
+    # Decode safely
     new_content = BytesIO()
     for char in content:
         try:
@@ -58,6 +62,9 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
         except Exception as ex:
             new_content.write(get_failsafe_char(char, output_encoding))
 
+    # Write decoded content
+    name, ext = os.path.splitext(in_file_name)
+    out_file_name = "%s.%s%s" % (name, output_encoding, ext)
     with open(out_file_name, 'wb') as out_file:
         out_file.write(new_content.getvalue())
     return True
