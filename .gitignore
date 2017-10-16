@@ -2,6 +2,7 @@
 *.egg-info
 *.sublime-*
 .tox
+.vscode
 build
 dist
 
