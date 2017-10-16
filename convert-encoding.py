@@ -11,11 +11,12 @@ Tested on Python 2.7+ and Python 3.2+
 created by Venelin Stoykov <vkstoykov@gmail.com>
 """
 from __future__ import unicode_literals
+import codecs
 import sys
 import os
 import logging
 
-from io import open, BytesIO
+from io import open
 from optparse import make_option, OptionParser
 
 __version__ = (0, 7)
@@ -35,8 +36,9 @@ def get_version():
     return '.'.join(str(x) for x in __version__)
 
 
-def get_failsafe_char(char, output_encoding):
-    return FAILSAFE_CHARACTERS.get(char, '?').encode(output_encoding)
+def encoding_error_handler(err):
+    bad_text = err.object[err.start:err.end]
+    return ''.join(FAILSAFE_CHARACTERS.get(c, '?') for c in bad_text), err.end
 
 
 def read_file(file_name, ecoding):
@@ -54,19 +56,15 @@ def convert_to(in_file_name, input_encoding=DEFAULT_INPUT_ENCODING,
         logging.error("Can't read '%s' because: %s" % (in_file_name, ex))
         return False
 
-    # Decode safely
-    new_content = BytesIO()
-    for char in content:
-        try:
-            new_content.write(char.encode(output_encoding))
-        except Exception as ex:
-            new_content.write(get_failsafe_char(char, output_encoding))
-
-    # Write decoded content
     name, ext = os.path.splitext(in_file_name)
     out_file_name = "%s.%s%s" % (name, output_encoding, ext)
-    with open(out_file_name, 'wb') as out_file:
-        out_file.write(new_content.getvalue())
+
+    # Write the content in the new encoding with our custom fallback
+    with open(out_file_name, 'wt',
+              encoding=output_encoding,
+              errors='convert_encoding_fallback_replace',
+              newline='') as out_file:
+        out_file.write(content)
     return True
 
 
@@ -78,6 +76,9 @@ def main(*args, **options):
     if has_errors:
         sys.exit(1)
 
+
+codecs.register_error('convert_encoding_fallback_replace',
+                      encoding_error_handler)
 
 if __name__ == '__main__':
     prog_name = os.path.basename(sys.argv[0])
