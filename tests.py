@@ -3,8 +3,6 @@ from __future__ import unicode_literals
 import os
 import tempfile
 import shutil
-import subprocess
-import sys
 from unittest import TestCase
 
 
@@ -12,6 +10,7 @@ class ConvertEncodingTestCase(TestCase):
 
     def setUp(self):
         self.tempdir = tempfile.mkdtemp()
+        self.convert_encoding = __import__("convert-encoding")
 
     def tearDown(self):
         shutil.rmtree(self.tempdir, ignore_errors=True)
@@ -23,15 +22,13 @@ class ConvertEncodingTestCase(TestCase):
             with tmp_file:
                 tmp_file.write(input_text)
 
-            retcode = subprocess.call([
-                sys.executable, 'convert-encoding.py',
-                '-i', input_encoding,
-                '-o', output_encoding,
-                tmp_file.name])
+            success = self.convert_encoding.convert_to(tmp_file.name,
+                                                       input_encoding=input_encoding,
+                                                       output_encoding=output_encoding)
 
             new_file_name = tmp_file.name[:-4] + '.' + output_encoding + '.txt'
 
-            self.assertEqual(retcode, 0)
+            self.assertTrue(success)
             self.assertTrue(os.path.isfile(new_file_name))
 
             with open(new_file_name, 'rb') as new_file:
