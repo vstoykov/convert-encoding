@@ -1,6 +1,7 @@
 *.py[co]
 *.egg-info
 *.sublime-*
+.tox
 build
 dist
 

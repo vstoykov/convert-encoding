@@ -12,6 +12,7 @@ setup(
     characters in Panasonic Viera TV""",
     url="https://github.com/vstoykov/convert-encoding",
     scripts=['convert-encoding.py'],
+    test_suite='tests',
     classifiers=[
         "Operating System :: OS Independent",
         "Programming Language :: Python",
